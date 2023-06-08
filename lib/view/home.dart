@@ -1,5 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_webview_pro/webview_flutter.dart';
 
 class PageHome extends StatefulWidget {
   const PageHome({Key? key}) : super(key: key);
@@ -9,19 +11,67 @@ class PageHome extends StatefulWidget {
 }
 
 class _PageHomeState extends State<PageHome> {
-  late WebViewController controller;
+  final Completer<WebViewController> _controller =
+      Completer<WebViewController>();
   bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // late final PlatformWebViewControllerCreationParams params;
+    // if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+    //   params = WebKitWebViewControllerCreationParams(
+    //     allowsInlineMediaPlayback: true,
+    //     mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+    //   );
+    // } else {
+    //   params = const PlatformWebViewControllerCreationParams();
+    // }
+
+    // final WebViewController controller =
+    //     WebViewController.fromPlatformCreationParams(params);
+
+    // controller
+    //   ..setJavaScriptMode(JavaScriptMode.unrestricted)
+    //   ..setNavigationDelegate(NavigationDelegate(
+    //     onPageStarted: (url) {
+    //       print('page Started : $url');
+    //       Future.delayed(const Duration(milliseconds: 1000), () {
+    //         setState(() {
+    //           isLoading = false;
+    //         });
+    //       });
+    //     },
+    //     onPageFinished: (url) {
+    //       print('finished');
+    //       controller.runJavaScript(
+    //           "document.getElementsByTagName('header')[0].style.display='none'");
+    //       controller.runJavaScript(
+    //           "document.getElementsByTagName('footer')[0].style.display='none'");
+    //     },
+    //   ))
+    //   ..loadRequest(Uri.parse('https://records.yourmuneem.com/'));
+
+    // if (controller.platform is AndroidWebViewController) {
+    //   AndroidWebViewController.enableDebugging(true);
+    //   (controller.platform as AndroidWebViewController)
+    //       .setMediaPlaybackRequiresUserGesture(false);
+    // }
+    // webViewController = controller;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
         child: Stack(
           children: [
-            WebView(  
-              initialUrl: 'https://www.opstreams.live',
+            WebView(
+              // controller: webViewController,
+              initialUrl: 'https://records.yourmuneem.com/',
               javascriptMode: JavascriptMode.unrestricted,
               onWebViewCreated: (controller) {
-                this.controller = controller;
+                _controller.complete(controller);
               },
               onPageStarted: (url) {
                 print('page Started : $url');
@@ -31,12 +81,12 @@ class _PageHomeState extends State<PageHome> {
                   });
                 });
               },
-              onPageFinished: (url) {
+              onPageFinished: (url) async {
                 print('finished');
-                controller.runJavascript(
-                    "document.getElementsByTagName('header')[0].style.display='none'");
-                controller.runJavascript(
-                    "document.getElementsByTagName('footer')[0].style.display='none'");
+                // _controller.runJavaScript(
+                //     "document.getElementsByTagName('header')[0].style.display='none'");
+                // _controller.runJavascript(
+                //     "document.getElementsByTagName('footer')[0].style.display='none'");
               },
             ),
             if (isLoading)
@@ -50,15 +100,14 @@ class _PageHomeState extends State<PageHome> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final urlCurrent = await controller.currentUrl();
-          print('current url $urlCurrent');
-          controller
-              .loadUrl('https://www.Youtube.com');
-        },
-        child: const Icon(Icons.video_collection_outlined, size: 35),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async {
+      //     final urlCurrent = await webViewController.currentUrl();
+      //     print('current url $urlCurrent');
+      //     webViewController.loadRequest('https://www.Youtube.com');
+      //   },
+      //   child: const Icon(Icons.video_collection_outlined, size: 35),
+      // ),
     );
   }
 }
